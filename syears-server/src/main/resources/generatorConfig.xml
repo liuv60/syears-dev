@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration >
+  <classPathEntry location="C:\Program Files (x86)\MySQL\MySQL Connector J\mysql-connector-java-5.1.36-bin.jar" />
+    
+  <context id="context1"  targetRuntime="Ibatis2Java5"> 
+	<jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://localhost:3306/sydb?characterEncoding=UTF-8" userId="root" password="test" />
+    <javaModelGenerator targetPackage="com.syears.person.model" targetProject="syears-server">
+    	<property name="enableSubPackages" value="false" />
+        <property name="trimStrings" value="true" />
+    </javaModelGenerator>
+    <sqlMapGenerator targetPackage="com.syears.person.mapper" targetProject="syears-server" />
+    <javaClientGenerator targetPackage="com.syears.person.client" targetProject="syears-server" type="SPRING" />
+    <table tableName="ST_AnimalSign" domainObjectName="STAnimalSignEntity" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"  ></table>
+    <table tableName="ST_PersonArticle" domainObjectName="STPersonArticleEntity" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"  ></table>
+    <table tableName="ST_PersonArticleComment" domainObjectName="STPersonArticleCommentEntity" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"  ></table>
+    <table tableName="ST_PersonArticleGroup" domainObjectName="STPersonArticleGroupEntity" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"  ></table>
+    <table tableName="ST_PersonInfo" domainObjectName="STPersonInfoEntity" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"  ></table>
+    <table tableName="ST_PersonYearAge" domainObjectName="STPersonYearAgeEntity" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"  ></table>
+    <table tableName="ST_USER" domainObjectName="STUserEntity" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"  ></table>
+    
+  </context>
+</generatorConfiguration>
+

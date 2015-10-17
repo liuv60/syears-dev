@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syears.data.mappers.person.UserMapper">
+
+	<resultMap id="UserEntityMap" type="com.syears.data.models.person.STUserEntity" >
+    	<!--id可提高效率-->
+    	<id column="UserID" property="userid"  />
+    	<result column="UserName" property="username"  />
+    	<result column="FullName" property="fullname"  />
+    	<result column="Tel" property="tel"  />
+    	<result column="QQ" property="qq"  />
+    	<result column="Weixin" property="weixin"  />
+    	<result column="Password" property="password"  />
+    	<result column="Sex" property="sex"  />
+    	<result column="RegDate" property="regdate"  />
+    	<result column="PersonID" property="personid"  />
+  	</resultMap>
+	
+
+	<!-- 添加 用户 -->
+	<insert id="createUser" parameterType="com.syears.data.models.person.STUserEntity">
+		INSERT INTO
+		ST_User(UserID,UserName,FullName,Tel,QQ,Weixin,Password,Sex,RegDate,PersonID,UserStatus)
+		VALUES(#{userid},#{username},#{fullname},#{tel},#{qq},#{weixin},#{password},#{sex},#{regdate},#{personid},1)
+	</insert>
+	
+	<!-- 获取用户信息 -->
+	<select id="getUser" parameterType="com.syears.controllers.params.person.UserParams" resultMap="UserEntityMap">
+
+		SELECT *
+		FROM ST_User WHERE UserName=#{username} and Password = #{password} 
+	</select>
+
+	<!-- 删除用户，状态级 -->
+	<update id="deleteUser" parameterType="java.lang.String">
+		UPDATE ST_User SET
+		UserStatus = 0 WHERE UserName = #{username}
+	</update>
+	<!-- 通过编号查找用户 -->
+	<select id="findUserById" parameterType="java.lang.String" resultMap="UserEntityMap">
+		SELECT * FROM ST_User
+		WHERE UserID = #{0} AND
+		UserStatus = 1
+	</select>
+
+	<!-- 通过用户名查找用户 -->
+	<select id="findUserByName" parameterType="java.lang.String" resultMap="UserEntityMap">
+		SELECT * FROM ST_User
+		WHERE UserName = #{0} AND
+		UserStatus = 1
+	</select>
+
+	<!-- 查询所有用户数 -->
+	<select id="countAll" resultType="int">
+		SELECT count(*) FROM ST_User
+		AND UserStatus = 1
+	</select>
+	<!-- 查询是否有该用户，同名判断 -->
+	<select id="countUser" parameterType="java.lang.String" resultType="int">
+		SELECT count(*) FROM ST_User where UserName = #{username}
+		AND UserStatus = 1
+	</select>
+
+
+	<!-- 修改密码 -->
+	<update id="updatePassword" parameterType="com.syears.controllers.params.person.UserParams">
+
+		update ST_User user
+		set user.Password = #{password}
+
+		where user.UserName = #{username} 
+
+	</update>
+	
+
+
+	<!-- 修改用户名 -->
+	<update id="updateUserName" parameterType="java.lang.String">
+
+		update ST_User user
+		set user.UserName = #{username}
+
+		where user.UserName = #{username}
+
+	</update>
+	
+
+
+	
+</mapper>

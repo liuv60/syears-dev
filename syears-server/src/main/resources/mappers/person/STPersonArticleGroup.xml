@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syears.data.mappers.person.STPersonArticleGroupMapper">
+
+	<resultMap id="PersonArticleGroupEntityMap" type="com.syears.data.models.person.STPersonArticleGroupEntity" >
+    	<!--id可提高效率-->
+    	<id column="personarticlegroupid" property="PersonArticleGroupID"  />
+    	<result column="personarticlegroupname" property="PersonArticleGroupName"  />
+    	<result column="personarticlegrouptype" property="PersonArticleGroupType"  />
+    	<result column="personarticlegroupstatus" property="PersonArticleGroupStatus"  />
+  	</resultMap>
+	
+	<!-- 添加 个人文章分组 -->
+	<insert id="createPersonArticleGroup" parameterType="com.syears.data.models.person.STPersonArticleGroupEntity">
+		INSERT INTO
+		ST_PersonArticleGroup(PersonArticleGroupID,PersonArticleGroupName,PersonArticleGroupType,PersonArticleGroupStatus)
+		VALUES(#{personArticleGroupID},#{personArticleGroupName},#{personArticleGroupType},#{personArticleGroupStatus})
+	</insert>
+
+	<!--获取所有信息-->
+	<select id="getPersonArticleGroup" resultMap="PersonArticleGroupEntityMap">
+		SELECT * FROM ST_PersonArticleGroup where 1=1
+	</select>
+
+	<!-- 删除，状态级 -->
+	<update id="deletePersonArticleGroup" parameterType="java.lang.String">
+		UPDATE ST_PersonArticleGroup SET
+		PersonArticleGroupStatus = 0 WHERE PersonArticleGroupID = #{personArticleGroupID}
+	</update>
+
+	<!-- 更新 个人文章分组 -->
+	<update id="editPersonArticleGroup" parameterType="com.syears.data.models.person.STPersonArticleGroupEntity">
+		update
+		ST_PersonArticleGroup set PersonArticleGroupName = #{personArticleGroupName}, PersonArticleGroupType = #{personArticleGroupType}, PersonArticleGroupStatus 
+		where PersonArticleGroupID = #{personArticleGroupID}, 
+	</update>
+</mapper>

@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.syears.data.mappers.OrderMapper">
+
+	<resultMap id="MerchantOrderHeader"
+		type="com.syears.commons.vo.merchant.MerchantOrderHeaderVO">
+
+		<result column="ORDER_NO" property="orderNo" />
+		<result column="BUYER_ID" property="buyerId" />
+		<result column="ORDER_STATUS" property="orderStatus" />
+		<result column="repast_Time" property="repastTime" />
+		<result column="repast_Address" property="repastAddress" />
+		<result column="dishes_Id" property="dishesId" />
+
+
+	</resultMap>
+	<resultMap id="MerchantOrderDetail" type="com.syears.commons.vo.MerchantOrderDetailVO">
+		<result column="ORDER_NO" property="orderNo" />
+		<result column="BUYER_ID" property="buyerId" />
+		<result column="ORDER_STATUS" property="orderStatus" />
+		<result column="repast_Time" property="repastTime" />
+		<result column="order_time" property="orderTime" />
+		<result column="repast_Address" property="repastAddress" />
+		<result column="dishes_Id" property="dishesId" />
+		<result column="payment_way" property="paymentWay" />
+	</resultMap>
+
+	<resultMap id="OrderEntityMap" type="com.syears.data.models.OrderEntity">
+		<result column="ORDER_NO" property="orderNo" />
+		<result column="BUYER_ID" property="buyerId" />
+		<result column="ORDER_STATUS" property="orderStatus" />
+		<result column="repast_Time" property="repastTime" />
+		<result column="repast_Address" property="repastAddress" />
+		<result column="dishes_Id" property="dishesId" />
+	</resultMap>
+
+	<resultMap id="OrderFullEntityMap" type="com.syears.data.models.OrderEntity">
+		<id column="ORDER_ID" property="id" />
+		<result column="ORDER_NO" property="orderNo" />
+		<result column="DATA_STATUS" property="dataStatus" />
+		<result column="ORDER_STATUS" property="orderStatus" />
+		<result column="ORIGINAL_PRICE" property="orgPrice" />
+		<result column="DISCOUNT_PRICE" property="discountPrice" />
+		<result column="SELLER_ID" property="sellerId" />
+		<result column="BUYER_ID" property="buyerId" />
+		<result column="ORDER_TIME" property="orderTime" />
+		<result column="REPAST_TIME" property="repastTime" />
+		<result column="REPAST_MODE" property="repastMode" />
+		<result column="REPAST_ADDRESS" property="repastAddress" />
+		<result column="COUPON_ID" property="couponId" />
+		<result column="COMMENTS" property="comments" />
+		<result column="CHARGE_ID" property="chargeId" />
+		<result column="ACTIVE_ID" property="activeId" />
+		<result column="COMMENT_STATUS" property="commentStatus" />
+	</resultMap>
+
+    <resultMap id="OrderDishEntityMap" type="com.syears.data.models.OrderDishRelEntity">
+        <id column="ID" property="id"/>
+        <result column="ORDER_NO" property="orderNo"/>
+        <result column="DISH_ID" property="itemId"/>
+        <result column="DATA_STATUS" property="dataStatus"/>
+        <result column="DISH_COUNT" property="count"/>
+    </resultMap>
+
+
+
+
+	<resultMap id="MechantMenuVO" type="com.syears.commons.vo.MechantMenuVO">
+
+		<result column="dish_id" property="menuId" />
+		<result column="dish_Count" property="dishCount" />
+
+	</resultMap>
+
+
+
+
+
+	<select id="findOrders" parameterType="com.syears.data.models.OrderEntity"
+		resultMap="MerchantOrderHeader">
+
+
+		SELECT
+		orders.ORDER_NO,
+		orders.repast_Address,
+		orders.repast_Time,
+		orders.BUYER_ID,
+		orders.ORIGINAL_PRICE,
+		orders.order_status,
+		dishes.dishes_Id
+		FROM
+		TBL_ORDERS orders
+		JOIN (
+		SELECT
+		orders.ORDER_NO,
+		group_concat(dishes.DISH_ID) AS dishes_Id
+		FROM
+		TBL_ORDERS orders
+		JOIN
+		TBL_REL_ODR_DISH dishes ON orders.ORDER_NO = dishes.ORDER_NO
+		GROUP BY
+		orders.ORDER_NO
+		) dishes ON orders.ORDER_NO = dishes.ORDER_NO
+		WHERE
+		1 = 1
+
+		<if test="sellerId != null and sellerId != ''">
+			and orders.seller_Id = #{sellerId}
+		</if>
+
+		<choose>  
+        <when test="orderStatus == -1 or orderStatus == -2">  
+           
+           and orders.order_Status in
+		<foreach collection="orderStatusList" open="(" close=")" item="orderStatus"
+			index="index" separator=",">
+			#{orderStatus}
+		</foreach>
+        </when>  
+  
+        <otherwise>  
+          and orders.order_Status = #{orderStatus}
+        </otherwise>  
+    	</choose>  
+
+		<if test="repastMode != null and repastMode != ''">
+			and orders.repast_Mode = #{repastMode}
+		</if>
+
+	</select>
+
+
+	<select id="findOrderDetail" parameterType="com.syears.data.models.OrderEntity"
+		resultMap="MerchantOrderDetail">
+
+
+		SELECT
+		orders.ORDER_NO,
+		orders.repast_Address,
+		orders.repast_Time,
+		orders.order_time,
+		orders.BUYER_ID,
+		orders.ORIGINAL_PRICE,
+		dishes.dishes_Id,
+		orders.payment_way,
+		orders.ORDER_STATUS
+		FROM
+		TBL_ORDERS orders
+		JOIN (
+		SELECT
+		orders.ORDER_NO,
+		group_concat(dishes.DISH_ID) AS dishes_Id
+		FROM
+		TBL_ORDERS orders
+		JOIN
+		TBL_REL_ODR_DISH dishes ON orders.ORDER_NO =
+		dishes.ORDER_NO
+		GROUP BY
+		orders.ORDER_NO
+		) dishes ON orders.ORDER_NO =
+		dishes.ORDER_NO
+		WHERE
+		1 = 1
+        <if test="orderNo != null and orderNo != ''">
+			and orders.ORDER_NO = #{orderNo}
+		</if>
+	
+
+	</select>
+
+
+	<select id="findMenuCount" parameterType="java.util.Map"
+		resultMap="MechantMenuVO">
+
+		SELECT
+		dishes.DISH_ID,
+		dishes.DISH_COUNT
+		FROM
+		TBL_REL_ODR_DISH dishes
+		WHERE 1 = 1
+
+
+		and dishes.ORDER_NO = #{orderNo}
+
+
+		and dishes.DISH_ID in
+		<foreach collection="dishesId" open="(" close=")" item="dishId"
+			index="index" separator=",">
+			#{dishId}
+		</foreach>
+
+	</select>
+
+
+	<select id="getOrder" parameterType="int" resultMap="OrderEntityMap">
+
+		SELECT *
+		FROM TBL_ORDERS WHERE ORDER_ID=#{id} AND DATA_STATUS = 1
+	</select>
+
+	<update id="deleteOrder" parameterType="java.lang.Integer">
+		UPDATE TBL_ORDERS SET
+		DATA_STATUS = 0 WHERE ORDER_ID = #{id}
+	</update>
+
+	<insert id="createOrder" parameterType="com.syears.data.models.OrderEntity">
+		INSERT INTO
+		TBL_ORDERS(ORDER_NO,SELLER_ID,BUYER_ID,ORIGINAL_PRICE,DISCOUNT_PRICE,ORDER_STATUS,COMMENTS,DATA_STATUS,REPAST_TIME,ORDER_TIME,REPAST_MODE,REPAST_ADDRESS,COUPON_ID,PAYMENT_WAY,CHARGE_ID,ACTIVE_ID,COMMENT_STATUS)
+		VALUES(#{orderNo},#{sellerId},#{buyerId},#{orgPrice},#{discountPrice},#{orderStatus},#{comments},#{dataStatus},#{repastTime},#{orderTime},#{repastMode},#{repastAddress},#{couponId},#{paymentWay},#{chargeId},#{activeId},#{commentStatus})
+	</insert>
+
+	<insert id="saveOrderDishes" useGeneratedKeys="true"
+		parameterType="java.util.List">
+		INSERT INTO TBL_REL_ODR_DISH (ORDER_NO, DISH_ID, DATA_STATUS,
+		DISH_COUNT) VALUE
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.orderNo},#{item.itemId},#{item.dataStatus},#{item.count})
+		</foreach>
+	</insert>
+
+	<insert id="createOrderDishRel" parameterType="com.syears.data.models.OrderDishRelEntity">
+		INSERT INTO
+		TBL_REL_ODR_DISH(ODR_ID,DISH_ID) VALUES(#{orderNo},#{itemId})
+	</insert>
+
+	<select id="findAll">
+		SELECT * FROM TBL_ORDERS
+	</select>
+
+	<select id="findOrderById" resultMap="OrderFullEntityMap">
+		SELECT * FROM TBL_ORDERS
+		WHERE ORDER_ID = #{0} AND
+		DATA_STATUS = 1
+	</select>
+
+	<select id="findAllByPagination" parameterType="com.syears.commons.Pagination"
+		resultMap="OrderEntityMap">
+		SELECT * FROM TBL_ORDERS ORDER BY #{orderBy} #{asc} LIMIT
+		#{start}, #{end}
+	</select>
+
+
+	<select id="getOrdersByBuyerId">
+		SELECT * FROM TBL_ORDERS WHERE BUYER_ID = #{0} AND
+		DATA_STATUS = 1 LIMIT
+		#{start}, #{end} ORDER BY #{1}.orderBy #{1}.asc
+	</select>
+
+
+
+	<select id="findByBuyerId" parameterType="java.util.Map" resultMap="OrderFullEntityMap">
+		SELECT * FROM TBL_ORDERS WHERE BUYER_ID = #{userId} AND DATA_STATUS = 1
+        <if test="commentStatus != null">
+            AND COMMENT_STATUS = #{commentStatus}
+        </if>
+		AND ORDER_STATUS IN (
+			<foreach collection="orderStatus" item="status" index="index" separator=",">
+				#{status}
+			</foreach>
+		)
+		ORDER BY ORDER_TIME DESC LIMIT #{start}, #{end}
+	</select>
+
+    <select id="findDishByOrderNo" parameterType="java.lang.String" resultMap="OrderDishEntityMap">
+        SELECT * FROM TBL_REL_ODR_DISH WHERE ORDER_NO = #{0}
+    </select>
+
+	<select id="findBySellerId">
+		SELECT * FROM TBL_ORDERS WHERE SELLER_ID = #{0} AND
+		DATA_STATUS = 1 LIMIT
+		#{start}, #{end} ORDER BY #{1}.orderBy #{1}.asc
+	</select>
+
+
+	<select id="findByCondition" parameterType="java.util.Map"
+		resultMap="OrderEntityMap">
+		SELECT * FROM TBL_ORDERS
+		WHERE 1=1
+		<!-- 此处Map的orderNo 获取方式不统一 -->
+		<if test="map.orderNo != null and map.orderNo != ''">
+			and ORDER_NO = #{map.orderNo}
+		</if>
+		<if test="map.sellerId != null and map.sellerId != ''">
+			and seller_Id = #{map.sellerId}
+		</if>
+		<if test="map.order.orderStatus != null">
+			and order_Status = #{map.order.orderStatus}
+		</if>
+
+		<if test="map.order.repastMode != null and map.order.repastMode != ''">
+			and repast_Mode = #{map.order.repastMode}
+		</if>
+		AND DATA_STATUS = 1
+
+		ORDER BY #{map.pager.orderBy} #{map.pager.asc}
+		LIMIT
+		#{map.pager.start}, #{map.pager.end}
+	</select>
+
+	<select id="countAll" resultType="int">
+		SELECT count(*) FROM TBL_ORDERS
+		AND DATA_STATUS = 1
+	</select>
+
+
+	<select id="getOrdersByParams" parameterType="com.syears.controllers.params.OrderParams"
+		resultMap="OrderFullEntityMap">
+		SELECT * FROM TBL_ORDERS
+		WHERE 1=1
+		<if test="orderNo != null and orderNo != ''">
+			and ORDER_NO = #{orderNo}
+		</if>
+		<if test="sellerId != null and sellerId!=''">
+			and SELLER_ID = #{sellerId}
+		</if>
+		<if test="buyerId != null and buyerId != ''">
+			and BUYER_ID = #{buyerId}
+		</if>
+		<if test="orderStatus != null"> and ORDER_STATUS = #{orderStatus} </if>
+		AND DATA_STATUS = 1
+		<!-- 排序分页 -->
+		<if test="orderBy!=null">ORDER BY #{orderBy} #{asc}</if>
+		<if test="start!=null and end!=null">
+			LIMIT #{start}, #{pageSize}
+		</if>
+
+
+	</select>
+
+
+	<select id="count" parameterType="com.syears.controllers.params.OrderParams"
+		resultType="int">
+		SELECT count(*) FROM TBL_ORDERS
+		WHERE  DATA_STATUS = 1
+		<if test="orderNo != null and orderNo != ''">
+			and ORDER_NO = #{orderNo}
+		</if>
+		<if test="sellerId != null and sellerId!=''">
+			and SELLER_ID = #{sellerId}
+		</if>
+		<if test="buyerId != null and buyerId != ''">
+			and BUYER_ID = #{buyerId}
+		</if>
+		<if test="orderStatus != null"> and ORDER_STATUS = #{orderStatus} </if>
+	</select>
+
+
+	<update id="updateOrder" parameterType="com.syears.controllers.params.OrderParams">
+
+		update TBL_ORDERS orders
+		set orders.order_status = #{orderStatus}
+
+		where orders.order_no =
+		#{orderNo} AND DATA_STATUS = 1
+
+	</update>
+	
+	
+	
+		<select id="findOrderSummary" parameterType="com.syears.controllers.params.OrderParams"
+		resultType="java.util.Map">
+		
+	SELECT
+	o.order_status,
+	COUNT(o.ORDER_STATUS) AS amount
+FROM
+	TBL_ORDERS o
+WHERE
+	1 = 1
+
+		
+		<if test="sellerId != null and sellerId != ''">
+			and o.seller_Id = #{sellerId}
+		</if>
+		
+		
+		GROUP BY
+	o.ORDER_STATUS
+		
+	</select>
+	
+	
+	
+	
+	
+</mapper>
